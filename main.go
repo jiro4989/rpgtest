@@ -9,17 +9,12 @@ type Unit struct {
 	Armor
 }
 
-type Battler interface {
-	Attacker
-	Defender
-}
-
 type Attacker interface {
-	Attack()
+	Attack(p *Param)
 }
 
 type Defender interface {
-	Defend()
+	Defend(p *Param)
 }
 
 type Skill int
@@ -34,6 +29,11 @@ type Actor struct {
 	Param
 	Weapon
 	Armor
+}
+
+func (a *Actor) Attack(p *Param) {
+	dmg := a.ATK*4 - p.DEF*2
+	p.HP -= dmg
 }
 
 type Enemy struct {
