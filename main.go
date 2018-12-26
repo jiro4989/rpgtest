@@ -10,8 +10,16 @@ type Unit struct {
 }
 
 type Battler interface {
-	Attack(p Param)
-	Guard(p Param)
+	Attacker
+	Defender
+}
+
+type Attacker interface {
+	Attack()
+}
+
+type Defender interface {
+	Defend()
 }
 
 type Skill int
