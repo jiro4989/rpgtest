@@ -9,11 +9,18 @@ type Attacker interface {
 }
 
 type Equiper interface {
-	Equip(p *Param)
+	EquipWeapon(w Weapon) Param
+	EquipArmor(a Armor) Param
+	RemoveWeapon() Weapon
+	RemoveArmor() Armor
 }
 
 type Actor struct {
+	MHP int64
+	MMP int64
 	Param
+	Weapon
+	Armor
 }
 
 func (a *Actor) Attack(p *Param) {
@@ -21,7 +28,37 @@ func (a *Actor) Attack(p *Param) {
 	p.HP -= dmg
 }
 
+func (a *Actor) EquipWeapon(w Weapon) Param {
+	diff := a.Param.Sub(&w.Param)
+	a.Param = a.Param.Add(&w.Param)
+	a.Weapon = w
+	return diff
+}
+
+func (a *Actor) EquipArmor(am Armor) Param {
+	diff := a.Param.Sub(&am.Param)
+	a.Param = a.Param.Add(&am.Param)
+	a.Armor = am
+	return diff
+}
+
+func (a *Actor) RemoveWeapon() Weapon {
+	w := a.Weapon
+	a.Param = a.Param.Sub(&w.Param)
+	a.Weapon = weapons[0]
+	return w
+}
+
+func (a *Actor) RemoveArmor() Armor {
+	am := a.Armor
+	a.Param = a.Param.Sub(&am.Param)
+	a.Armor = armors[0]
+	return am
+}
+
 type Enemy struct {
+	MHP int64
+	MMP int64
 	Param
 }
 
@@ -32,8 +69,6 @@ func (e *Enemy) Attack(p *Param) {
 
 // Param は能力値
 type Param struct {
-	MHP int64
-	MMP int64
 	HP  int64
 	MP  int64
 	ATK int64
@@ -42,6 +77,32 @@ type Param struct {
 	MDF int64
 	SPD int64
 	LUK int64
+}
+
+func (p *Param) Add(p2 *Param) Param {
+	return Param{
+		HP:  p.HP + p2.HP,
+		MP:  p.MP + p2.MP,
+		ATK: p.ATK + p2.ATK,
+		DEF: p.DEF + p2.DEF,
+		MAT: p.MAT + p2.MAT,
+		MDF: p.MDF + p2.MDF,
+		SPD: p.SPD + p2.SPD,
+		LUK: p.LUK + p2.LUK,
+	}
+}
+
+func (p *Param) Sub(p2 *Param) Param {
+	return Param{
+		HP:  p.HP - p2.HP,
+		MP:  p.MP - p2.MP,
+		ATK: p.ATK - p2.ATK,
+		DEF: p.DEF - p2.DEF,
+		MAT: p.MAT - p2.MAT,
+		MDF: p.MDF - p2.MDF,
+		SPD: p.SPD - p2.SPD,
+		LUK: p.LUK - p2.LUK,
+	}
 }
 
 type Weapon struct {
@@ -61,15 +122,20 @@ type Armor struct {
 type Armors []Armor
 
 var weapons = Weapons{
-	Weapon{ID: 0, Name: "なし", Param: Param{HP: 0, MP: 0, ATK: 0, DEF: 0, MAT: 0, MDF: 0, SPD: 5, LUK: 0}},
-	Weapon{ID: 1, Name: "ひのきのぼう", Param: Param{HP: 0, MP: 0, ATK: 5, DEF: 0, MAT: 0, MDF: 0, SPD: 0, LUK: 0}},
+	Weapon{ID: 0, Name: "なし"},
+	Weapon{ID: 1, Name: "ひのきのぼう", Param: Param{ATK: 5}},
+}
+
+var armors = Armors{
+	Armor{ID: 0, Name: "なし"},
+	Armor{ID: 1, Name: "布の服", Param: Param{DEF: 3}},
 }
 
 func main() {
 	actor := Actor{
+		MHP: 100,
+		MMP: 100,
 		Param: Param{
-			MHP: 100,
-			MMP: 100,
 			HP:  100,
 			MP:  100,
 			ATK: 25,
@@ -81,9 +147,9 @@ func main() {
 		},
 	}
 	enemy := Enemy{
+		MHP: 100,
+		MMP: 100,
 		Param: Param{
-			MHP: 100,
-			MMP: 100,
 			HP:  100,
 			MP:  100,
 			ATK: 10,
