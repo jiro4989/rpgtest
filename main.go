@@ -2,37 +2,16 @@ package main
 
 import "fmt"
 
-// Unit はキャラユニットを定義
-type Unit struct {
-	Param
-	Weapon
-	Armor
-}
-
 type Attacker interface {
 	Attack(p *Param)
 }
 
-type Defender interface {
-	Defend(p *Param)
-}
-
-type Skill int
-
-// Actor/Enemyには固定値としてのパラメータと
-// 戦闘の時に動的に変化するパラメータがある
-// Paramで装備品と共有する能力値とすると
-// 装備品にMHP, MMPは不要になる。
-// どうする？
-
 type Actor struct {
 	Param
-	Weapon
-	Armor
 }
 
 func (a *Actor) Attack(p *Param) {
-	dmg := a.ATK*4 - p.DEF*2
+	dmg := a.Param.ATK*4 - p.DEF*2
 	p.HP -= dmg
 }
 
@@ -40,8 +19,15 @@ type Enemy struct {
 	Param
 }
 
+func (e *Enemy) Attack(p *Param) {
+	dmg := e.Param.ATK*4 - p.DEF*2
+	p.HP -= dmg
+}
+
 // Param は能力値
 type Param struct {
+	MHP int64
+	MMP int64
 	HP  int64
 	MP  int64
 	ATK int64
@@ -60,5 +46,42 @@ type Armor struct {
 }
 
 func main() {
+	actor := Actor{
+		Param: Param{
+			MHP: 100,
+			MMP: 100,
+			HP:  100,
+			MP:  100,
+			ATK: 25,
+			DEF: 10,
+			MAT: 100,
+			MDF: 100,
+			SPD: 100,
+			LUK: 100,
+		},
+	}
+	enemy := Enemy{
+		Param: Param{
+			MHP: 100,
+			MMP: 100,
+			HP:  100,
+			MP:  100,
+			ATK: 10,
+			DEF: 4,
+			MAT: 100,
+			MDF: 100,
+			SPD: 100,
+			LUK: 100,
+		},
+	}
 	fmt.Println("hello")
+
+	fmt.Println("actor:", actor)
+	fmt.Println("enemy:", enemy)
+
+	actor.Attack(&enemy.Param)
+	enemy.Attack(&actor.Param)
+
+	fmt.Println("actor:", actor)
+	fmt.Println("enemy:", enemy)
 }
