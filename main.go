@@ -29,6 +29,7 @@ func (a *Actor) Attack(p *Param) {
 }
 
 func (a *Actor) EquipWeapon(w Weapon) Param {
+	a.RemoveWeapon()
 	diff := a.Param.Sub(&w.Param)
 	a.Param = a.Param.Add(&w.Param)
 	a.Weapon = w
@@ -36,6 +37,7 @@ func (a *Actor) EquipWeapon(w Weapon) Param {
 }
 
 func (a *Actor) EquipArmor(am Armor) Param {
+	a.RemoveArmor()
 	diff := a.Param.Sub(&am.Param)
 	a.Param = a.Param.Add(&am.Param)
 	a.Armor = am
@@ -160,11 +162,11 @@ func main() {
 			LUK: 100,
 		},
 	}
-	fmt.Println("hello")
 
 	fmt.Println("actor:", actor)
 	fmt.Println("enemy:", enemy)
 
+	actor.EquipWeapon(weapons[1])
 	actor.Attack(&enemy.Param)
 	enemy.Attack(&actor.Param)
 
