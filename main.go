@@ -1,9 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Attacker interface {
 	Attack(p *Param)
+}
+
+type Equiper interface {
+	Equip(p *Param)
 }
 
 type Actor struct {
@@ -11,7 +17,7 @@ type Actor struct {
 }
 
 func (a *Actor) Attack(p *Param) {
-	dmg := a.Param.ATK*4 - p.DEF*2
+	dmg := a.ATK*4 - p.DEF*2
 	p.HP -= dmg
 }
 
@@ -20,7 +26,7 @@ type Enemy struct {
 }
 
 func (e *Enemy) Attack(p *Param) {
-	dmg := e.Param.ATK*4 - p.DEF*2
+	dmg := e.ATK*4 - p.DEF*2
 	p.HP -= dmg
 }
 
@@ -39,10 +45,24 @@ type Param struct {
 }
 
 type Weapon struct {
+	ID   int
+	Name string
 	Param
 }
+
+type Weapons []Weapon
+
 type Armor struct {
+	ID   int
+	Name string
 	Param
+}
+
+type Armors []Armor
+
+var weapons = Weapons{
+	Weapon{ID: 0, Name: "なし", Param: Param{HP: 0, MP: 0, ATK: 0, DEF: 0, MAT: 0, MDF: 0, SPD: 5, LUK: 0}},
+	Weapon{ID: 1, Name: "ひのきのぼう", Param: Param{HP: 0, MP: 0, ATK: 5, DEF: 0, MAT: 0, MDF: 0, SPD: 0, LUK: 0}},
 }
 
 func main() {
